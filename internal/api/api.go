@@ -6,6 +6,7 @@ import (
 	"github.com/bantheus/ask-me-anything/internal/store/pgstore"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 )
 
 type apiHandler struct {
@@ -24,6 +25,17 @@ func NewHandler(q *pgstore.Queries) http.Handler {
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID, middleware.Recoverer, middleware.Logger)
+
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
+
+	r.Get("/subscribe/{room_id}", a.handleSubscribe)
 
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/rooms", func(r chi.Router) {
@@ -49,6 +61,7 @@ func NewHandler(q *pgstore.Queries) http.Handler {
 	return a
 }
 
+func (h apiHandler) handleSubscribe(w http.ResponseWriter, r *http.Request)                 {}
 func (h apiHandler) handleCreateRoom(w http.ResponseWriter, r *http.Request)                {}
 func (h apiHandler) handleGetRooms(w http.ResponseWriter, r *http.Request)                  {}
 func (h apiHandler) handleGetRoomMessages(w http.ResponseWriter, r *http.Request)           {}
