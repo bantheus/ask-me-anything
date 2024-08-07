@@ -14,7 +14,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func main(){
+func main() {
 	if err := godotenv.Load(); err != nil {
 		panic(err)
 	}
